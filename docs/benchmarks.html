@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>packetwisp benchmarks</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-2:       #eb6834;
+    --series-3:       #1baf7a;
+    --series-4:       #eda100;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:           #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-4:       #c98500;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:           #0d0d0d;
+    --surface-1:      #1a1a19;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-4:       #c98500;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 16px 56px;
+    background: var(--page);
+    color: var(--text-primary);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; }
+
+  header { margin-bottom: 28px; }
+  h1 { font-size: 30px; font-weight: 640; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .sub { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .prov { color: var(--text-muted); font-size: 12.5px; margin: 6px 0 0; }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .tile .k { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 8px; }
+  .tile .v { font-size: 34px; font-weight: 660; letter-spacing: -0.02em; line-height: 1.05; }
+  .tile .n { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 24px 20px; margin-bottom: 18px;
+  }
+  .card h2 { font-size: 17px; font-weight: 620; margin: 0 0 3px; letter-spacing: -0.01em; }
+  .card .desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 18px; }
+
+  .facet { margin-bottom: 18px; }
+  .facet:last-of-type { margin-bottom: 0; }
+  .facet .ft {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--text-muted);
+    padding-bottom: 7px; margin-bottom: 10px; border-bottom: 1px solid var(--grid);
+  }
+
+  .row { display: grid; grid-template-columns: 178px 1fr; align-items: center; gap: 12px; margin-bottom: 2px; }
+  .row:last-child { margin-bottom: 0; }
+  .rl { font-size: 13px; color: var(--text-secondary); text-align: right; }
+  /* grid rather than flex so a 100%-width bar can never push its label off the
+     right edge -- the label column is reserved up front */
+  .track { display: grid; grid-template-columns: minmax(0,1fr) 92px; align-items: center; gap: 9px; min-height: 26px; border-left: 1px solid var(--baseline); }
+  .bar { height: 17px; border-radius: 0 4px 4px 0; }
+  .val { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .val b { color: var(--text-primary); font-weight: 600; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--grid); }
+  .lg { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-secondary); }
+  .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+  caption { text-align: left; font-size: 13px; color: var(--text-secondary); padding-bottom: 10px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+  thead th { color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.best { color: var(--text-primary); font-weight: 640; }
+
+  .note { font-size: 12.5px; color: var(--text-secondary); margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--grid); }
+  footer { color: var(--text-muted); font-size: 12px; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>packetwisp benchmarks</h1>
+    <p class="sub">Schema-driven binary packets versus JSON on the wire.</p>
+    <p class="prov">Apple M2 · Node 22.23 · sizes averaged over 2,000 randomised <code>player-state</code> packets · compression is simulated permessage-deflate (shared context, flushed per message)</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile">
+      <div class="k">Size vs raw JSON</div>
+      <div class="v">6.5&times;</div>
+      <div class="n">smaller — 14.6 B vs 94.6 B</div>
+    </div>
+    <div class="tile">
+      <div class="k">Bandwidth saved</div>
+      <div class="v">4.15 TB</div>
+      <div class="n">per month at 20k msg/sec</div>
+    </div>
+    <div class="tile">
+      <div class="k">Encode CPU cost</div>
+      <div class="v">1.6%</div>
+      <div class="n">of one core — JSON uses 1.0%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Bytes per message</h2>
+    <p class="desc">Lower is better. Both panels share one scale, so bars are comparable across them.</p>
+
+    <div class="facet">
+      <div class="ft">Short name — "angel"</div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:12.7%;background:var(--series-1)"></div><span class="val"><b>14.6 B</b></span></div></div>
+      <div class="row"><div class="rl">packetwisp + deflate</div><div class="track"><div class="bar" style="width:15.9%;background:var(--series-2)"></div><span class="val">18.2 B</span></div></div>
+      <div class="row"><div class="rl">JSON + deflate</div><div class="track"><div class="bar" style="width:20.6%;background:var(--series-3)"></div><span class="val">23.7 B</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:82.4%;background:var(--series-4)"></div><span class="val">94.6 B</span></div></div>
+    </div>
+
+    <div class="facet">
+      <div class="ft">Long name — "xXx_ShadowSniper_2011_xXx"</div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:30.3%;background:var(--series-1)"></div><span class="val">34.8 B</span></div></div>
+      <div class="row"><div class="rl">packetwisp + deflate</div><div class="track"><div class="bar" style="width:16.2%;background:var(--series-2)"></div><span class="val"><b>18.6 B</b></span></div></div>
+      <div class="row"><div class="rl">JSON + deflate</div><div class="track"><div class="bar" style="width:20.7%;background:var(--series-3)"></div><span class="val">23.8 B</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:100%;background:var(--series-4)"></div><span class="val">114.8 B</span></div></div>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:var(--series-1)"></span>packetwisp</span>
+      <span class="lg"><span class="sw" style="background:var(--series-2)"></span>packetwisp + deflate</span>
+      <span class="lg"><span class="sw" style="background:var(--series-3)"></span>JSON + deflate</span>
+      <span class="lg"><span class="sw" style="background:var(--series-4)"></span>JSON</span>
+    </div>
+    <p class="note"><b>Turn WebSocket compression off for short strings.</b> packetwisp output is already dense, so deflate finds little to remove and its per-message overhead makes packets bigger — 14.6 B becomes 18.2 B. With long strings that reverses and deflate wins outright.</p>
+  </div>
+
+  <div class="card">
+    <h2>Throughput</h2>
+    <p class="desc">Higher is better. JSON figures include TextEncoder/TextDecoder, since bytes are what reach the wire.</p>
+
+    <div class="facet">
+      <div class="ft">Encode — object to bytes</div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:53.6%;background:var(--series-1)"></div><span class="val">1.26 M ops/s</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:83.0%;background:var(--series-2)"></div><span class="val"><b>1.95 M ops/s</b></span></div></div>
+    </div>
+    <div class="facet">
+      <div class="ft">Decode — bytes to object</div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:100%;background:var(--series-1)"></div><span class="val"><b>2.35 M ops/s</b></span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:96.6%;background:var(--series-2)"></div><span class="val">2.27 M ops/s</span></div></div>
+    </div>
+    <div class="facet">
+      <div class="ft">Round trip</div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:34.5%;background:var(--series-1)"></div><span class="val">0.81 M ops/s</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:46.4%;background:var(--series-2)"></div><span class="val"><b>1.09 M ops/s</b></span></div></div>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:var(--series-1)"></span>packetwisp</span>
+      <span class="lg"><span class="sw" style="background:var(--series-2)"></span>JSON + TextEncoder/Decoder</span>
+    </div>
+    <p class="note">V8's JSON is C++ and heavily optimised, so packetwisp does not beat it on speed — and does not need to. Decode is a tie that flips between runs. Size is the trade you are making.</p>
+  </div>
+
+  <div class="card">
+    <h2>Monthly bandwidth</h2>
+    <p class="desc">1,000 players &times; 20 ticks/sec &times; 30 days — 51.8 billion messages, short names.</p>
+    <div class="facet">
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:15.4%;background:var(--series-1)"></div><span class="val"><b>757 GB</b></span></div></div>
+      <div class="row"><div class="rl">packetwisp + deflate</div><div class="track"><div class="bar" style="width:19.2%;background:var(--series-2)"></div><span class="val">942 GB</span></div></div>
+      <div class="row"><div class="rl">JSON + deflate</div><div class="track"><div class="bar" style="width:25.1%;background:var(--series-3)"></div><span class="val">1.23 TB</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:100%;background:var(--series-4)"></div><span class="val">4.91 TB</span></div></div>
+    </div>
+    <p class="note">Against raw JSON that is <b>4.15 TB/month</b> saved; against compressed JSON, <b>471 GB/month</b> — for roughly half a percent of one CPU core.</p>
+  </div>
+
+  <div class="card">
+    <table>
+      <caption>All figures — the numbers behind every chart above.</caption>
+      <thead>
+        <tr><th>Encoding</th><th>Short name</th><th>Long name</th><th>Encode</th><th>Decode</th><th>Per month</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>packetwisp</td><td class="best">14.6 B</td><td>34.8 B</td><td>1.26 M/s</td><td class="best">2.35 M/s</td><td class="best">757 GB</td></tr>
+        <tr><td>packetwisp + deflate</td><td>18.2 B</td><td class="best">18.6 B</td><td>—</td><td>—</td><td>942 GB</td></tr>
+        <tr><td>JSON + deflate</td><td>23.7 B</td><td>23.8 B</td><td>—</td><td>—</td><td>1.23 TB</td></tr>
+        <tr><td>JSON</td><td>94.6 B</td><td>114.8 B</td><td class="best">1.95 M/s</td><td>2.27 M/s</td><td>4.91 TB</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>Reproduce with <code>npm run bench</code>.</footer>
+</div>
+</body>
+</html>
