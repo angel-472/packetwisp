@@ -194,4 +194,4 @@ npm run build
 
 ## License
 
-ISC
+ISC, see [LICENSE](LICENSE).

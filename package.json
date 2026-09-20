@@ -1,6 +1,6 @@
 {
   "name": "packetwisp",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Schema-driven binary packets for WebSockets. Describe your packet once, send 16 bytes instead of 93.",
   "license": "ISC",
   "author": "angel-472",
