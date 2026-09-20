@@ -1,9 +1,9 @@
 {
   "name": "packetwisp",
   "version": "1.0.0",
-  "description": "",
+  "description": "Schema-driven binary packets for WebSockets. Describe your packet once, send 16 bytes instead of 93.",
   "license": "ISC",
-  "author": "",
+  "author": "angel-472",
   "type": "commonjs",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -18,7 +18,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "!src/example.ts"
   ],
   "engines": {
     "node": ">=20"
@@ -27,7 +28,7 @@
     "build": "tsup && tsc -p tsconfig.build.json",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run typecheck && npm run build",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build",
     "example": "tsx src/example.ts",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -38,5 +39,25 @@
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
-  }
+  },
+  "keywords": [
+    "websocket",
+    "binary",
+    "serialization",
+    "packet",
+    "schema",
+    "arraybuffer",
+    "gamedev",
+    "multiplayer",
+    "netcode",
+    "bitpacking"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angel-472/packetwisp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/angel-472/packetwisp/issues"
+  },
+  "homepage": "https://github.com/angel-472/packetwisp#readme"
 }

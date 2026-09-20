@@ -5,7 +5,7 @@
 **Schema-driven binary packets for WebSockets.**
 Describe your packet once, send 16 bytes instead of 93.
 
-[![npm](https://img.shields.io/badge/npm-packetwisp-CB3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/packetwisp)
+<!-- [![npm](https://img.shields.io/badge/npm-packetwisp-CB3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/packetwisp) -->
 [![node](https://img.shields.io/badge/node-%E2%89%A520-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![types](https://img.shields.io/badge/types-included-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![license](https://img.shields.io/badge/license-ISC-blue)](#license)
@@ -116,7 +116,6 @@ Booleans pack most-significant-bit first, in schema order. The string takes the 
 | `encode(name, data)` | Returns an `ArrayBuffer`. Throws if `name` matches no schema. |
 | `decode(buffer)` | Returns the packet object, or `undefined` if the buffer is malformed. |
 | `getSchemaFromName(name)` | Look up a loaded schema. |
-| `getPacketIdFromName(name)` | The id `encode` writes into the header byte. |
 
 `decode` is built for untrusted input — non-buffers, truncated packets, unknown ids and random bytes all return `undefined` rather than throwing.
 

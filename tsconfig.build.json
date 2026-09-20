@@ -9,5 +9,11 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "tests",
+    "src/example.ts"
   ]
 }
