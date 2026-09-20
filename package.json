@@ -28,11 +28,15 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "example": "tsx src/example.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",
     "tsup": "^8.5.1",
-    "typescript": "^7.0.2"
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
   }
 }
