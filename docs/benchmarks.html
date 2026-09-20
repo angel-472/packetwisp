@@ -135,14 +135,14 @@
       <div class="n">smaller — 14.6 B vs 94.6 B</div>
     </div>
     <div class="tile">
+      <div class="k">Size vs compressed JSON</div>
+      <div class="v">1.6&times;</div>
+      <div class="n">smaller — 14.6 B vs 23.7 B</div>
+    </div>
+    <div class="tile">
       <div class="k">Bandwidth saved</div>
       <div class="v">4.15 TB</div>
       <div class="n">per month at 20k msg/sec</div>
-    </div>
-    <div class="tile">
-      <div class="k">Encode CPU cost</div>
-      <div class="v">1.6%</div>
-      <div class="n">of one core — JSON uses 1.0%</div>
     </div>
   </div>
 
@@ -182,24 +182,24 @@
     <div class="facet">
       <div class="ft">Encode — object to bytes</div>
       <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:53.6%;background:var(--series-1)"></div><span class="val">1.26 M ops/s</span></div></div>
-      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:83.0%;background:var(--series-2)"></div><span class="val"><b>1.95 M ops/s</b></span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:83.0%;background:var(--series-4)"></div><span class="val"><b>1.95 M ops/s</b></span></div></div>
     </div>
     <div class="facet">
       <div class="ft">Decode — bytes to object</div>
-      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:100%;background:var(--series-1)"></div><span class="val"><b>2.35 M ops/s</b></span></div></div>
-      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:96.6%;background:var(--series-2)"></div><span class="val">2.27 M ops/s</span></div></div>
+      <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:100%;background:var(--series-1)"></div><span class="val">2.35 M ops/s</span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:96.6%;background:var(--series-4)"></div><span class="val">2.27 M ops/s</span></div></div>
     </div>
     <div class="facet">
       <div class="ft">Round trip</div>
       <div class="row"><div class="rl">packetwisp</div><div class="track"><div class="bar" style="width:34.5%;background:var(--series-1)"></div><span class="val">0.81 M ops/s</span></div></div>
-      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:46.4%;background:var(--series-2)"></div><span class="val"><b>1.09 M ops/s</b></span></div></div>
+      <div class="row"><div class="rl">JSON</div><div class="track"><div class="bar" style="width:46.4%;background:var(--series-4)"></div><span class="val"><b>1.09 M ops/s</b></span></div></div>
     </div>
 
     <div class="legend">
       <span class="lg"><span class="sw" style="background:var(--series-1)"></span>packetwisp</span>
-      <span class="lg"><span class="sw" style="background:var(--series-2)"></span>JSON + TextEncoder/Decoder</span>
+      <span class="lg"><span class="sw" style="background:var(--series-4)"></span>JSON + TextEncoder/Decoder</span>
     </div>
-    <p class="note">V8's JSON is C++ and heavily optimised, so packetwisp does not beat it on speed — and does not need to. Decode is a tie that flips between runs. Size is the trade you are making.</p>
+    <p class="note">V8's JSON is C++ and heavily optimised, so packetwisp does not beat it on speed — and does not need to. Decode is a tie that flips between runs. At 20,000 messages/sec the entire cost of the trade is <b>+0.6% of one core</b>, which buys the bandwidth numbers below.</p>
   </div>
 
   <div class="card">
@@ -221,7 +221,7 @@
         <tr><th>Encoding</th><th>Short name</th><th>Long name</th><th>Encode</th><th>Decode</th><th>Per month</th></tr>
       </thead>
       <tbody>
-        <tr><td>packetwisp</td><td class="best">14.6 B</td><td>34.8 B</td><td>1.26 M/s</td><td class="best">2.35 M/s</td><td class="best">757 GB</td></tr>
+        <tr><td>packetwisp</td><td class="best">14.6 B</td><td>34.8 B</td><td>1.26 M/s</td><td>2.35 M/s</td><td class="best">757 GB</td></tr>
         <tr><td>packetwisp + deflate</td><td>18.2 B</td><td class="best">18.6 B</td><td>—</td><td>—</td><td>942 GB</td></tr>
         <tr><td>JSON + deflate</td><td>23.7 B</td><td>23.8 B</td><td>—</td><td>—</td><td>1.23 TB</td></tr>
         <tr><td>JSON</td><td>94.6 B</td><td>114.8 B</td><td class="best">1.95 M/s</td><td>2.27 M/s</td><td>4.91 TB</td></tr>
