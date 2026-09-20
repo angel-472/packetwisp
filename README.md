@@ -119,6 +119,66 @@ Booleans pack most-significant-bit first, in schema order. The string takes the 
 
 `decode` is built for untrusted input — non-buffers, truncated packets, unknown ids and random bytes all return `undefined` rather than throwing.
 
+## Benchmarks
+
+`npm run bench` — Apple M2, Node 22.23. Size figures are averages over 2,000
+packets with randomised values; compression is simulated `permessage-deflate`
+(one shared deflate context per connection, flushed per message).
+
+### Size
+
+The whole point. A `player-state` packet, short name:
+
+```
+packetwisp             █████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   14.6 B
+JSON                   ██████████████████████████████████   94.6 B
+JSON + deflate         █████████░░░░░░░░░░░░░░░░░░░░░░░░░   23.7 B
+packetwisp + deflate   ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░   18.2 B
+```
+
+| | short name | long name |
+|---|---|---|
+| **packetwisp** | **14.6 B** | **34.8 B** |
+| JSON | 94.6 B | 114.8 B |
+| JSON + deflate | 23.7 B | 23.8 B |
+| packetwisp + deflate | 18.2 B | 18.6 B |
+| *vs raw JSON* | *6.5x smaller* | *3.3x smaller* |
+| *vs deflated JSON* | *1.6x smaller* | *0.7x — deflate wins* |
+
+> [!TIP]
+> **Turn WebSocket compression off when your strings are short.** packetwisp
+> output is dense, so deflate can't find much to remove and its per-message
+> overhead makes packets *bigger* — 14.6 B becomes 18.2 B. Once strings get
+> long, that reverses: deflate compresses the text and wins outright. Measure
+> with your own payloads.
+
+### Speed
+
+| | packetwisp | JSON (+ TextEncoder/Decoder) | |
+|---|---|---|---|
+| encode | 1.26 M ops/s | 1.95 M ops/s | JSON 1.5x faster |
+| decode | 2.35 M ops/s | 2.27 M ops/s | tie (flips between runs) |
+| round trip | 0.81 M ops/s | 1.09 M ops/s | JSON 1.35x faster |
+
+V8's JSON parser is written in C++ and brutally optimised, so packetwisp does
+not beat it — and does not need to. At 20,000 messages/sec, encoding costs
+**1.6% of one core** versus JSON's 1.0%. You are trading half a percent of a
+CPU for the bandwidth numbers below.
+
+### What that means in practice
+
+1,000 players x 20 ticks/sec, 30 days — 51.8 billion messages:
+
+| | per message | per month |
+|---|---|---|
+| **packetwisp** | **14.6 B** | **757 GB** |
+| packetwisp + deflate | 18.2 B | 942 GB |
+| JSON + deflate | 23.7 B | 1.23 TB |
+| JSON | 94.6 B | 4.91 TB |
+
+**4.15 TB/month** saved against raw JSON, **471 GB/month** against compressed
+JSON — while costing you half a percent of a core.
+
 ## Caveats
 
 - **One string per packet**, and it is always written last. Schemas with more than one string field are skipped with a warning.
@@ -130,7 +190,8 @@ Booleans pack most-significant-bit first, in schema order. The string takes the 
 
 ```bash
 npm run example      # run src/example.ts
-npm test             # vitest
+npm test             # vitest (52 tests)
+npm run bench        # size + speed benchmarks
 npm run typecheck
 npm run build
 ```
