@@ -148,7 +148,6 @@ export class PacketWisp {
         currentByte += 1;
       }
     }
-    // TODO: packet decoding, packet-to-schema validation (type checking, strict or loose format validation)
     
     // encode string
     if(schema._stringFieldName !== undefined && packetData[schema._stringFieldName] !== undefined){
